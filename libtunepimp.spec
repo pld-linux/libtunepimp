@@ -8,6 +8,7 @@ Group:		Libraries
 Source0:	ftp://ftp.musicbrainz.org/pub/musicbrainz/%{name}-%{version}.tar.gz
 # Source0-md5:	f1f506914150c4917ec730f847ad4709
 Patch0:		%{name}-readline.patch
+Patch1:		%{name}-include_signal_h.patch
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
 BuildRequires:	libid3tag-devel >= 0.15.0b
@@ -55,7 +56,8 @@ Statyczna biblioteka libtunepimp.
 
 %prep
 %setup -q
-%patch -p1
+%patch0 -p1
+%patch1 -p1
 
 %build
 %{__libtoolize}
