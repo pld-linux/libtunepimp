@@ -1,0 +1,19 @@
+--- libtunepimp-0.2.0/configure.in.orig	2003-06-28 00:43:10.000000000 +0200
++++ libtunepimp-0.2.0/configure.in	2003-07-26 14:46:11.000000000 +0200
+@@ -43,14 +43,14 @@
+ 
+ dnl Check for readline. This is optional.
+ AC_CHECK_LIB(readline, readline,
+-             [READLINE_LIBS="-lreadline -ltermcap"
++             [READLINE_LIBS="-lreadline"
+              AC_DEFINE(HAVE_LIBREADLINE,1,[Readline Support])],
+              [echo "*"
+              echo "*  The GNU readline library isn't installed."
+              echo "*  This means the sample tagger, tp_tagger, won't"
+              echo "*  have readline support."
+              echo "*"
+-	     ],-ltermcap)
++	     ])
+ 
+ dnl Check for MAD decoder lib for mp3 support
+ AC_CHECK_LIB(mad,mad_version,
