@@ -1,12 +1,12 @@
 Summary:	The MusicBrainz tagging library
 Summary(pl):	Biblioteka znakowania MusicBrainz
 Name:		libtunepimp
-Version:	0.2.1
-Release:	2
+Version:	0.3.0
+Release:	1
 License:	GPL
 Group:		Libraries
 Source0:	ftp://ftp.musicbrainz.org/pub/musicbrainz/%{name}-%{version}.tar.gz
-# Source0-md5:	4bb8a0cb5ebbc3da720977191208088c
+# Source0-md5:	f1f506914150c4917ec730f847ad4709
 Patch0:		%{name}-readline.patch
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
@@ -72,9 +72,8 @@ rm -rf $RPM_BUILD_ROOT
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-# missing from make install
-install -d $RPM_BUILD_ROOT%{_includedir}/tunepimp
-install include/*.h lib/threads/posix/{mutex,thread,semaphore}.h \
+# not installed, but used by installed headers
+install lib/threads/posix/{mutex,thread,semaphore}.h \
 	lib/{filecache,analyzer,submit,lookup,filelookup,write,trm,metadata,lookuptools}.h \
 	$RPM_BUILD_ROOT%{_includedir}/tunepimp
 
