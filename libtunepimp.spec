@@ -2,7 +2,7 @@ Summary:	The MusicBrainz tagging library
 Summary(pl):	Biblioteka znakowania MusicBrainz
 Name:		libtunepimp
 Version:	0.2.1
-Release:	1
+Release:	2
 License:	GPL
 Group:		Libraries
 Source0:	ftp://ftp.musicbrainz.org/pub/musicbrainz/%{name}-%{version}.tar.gz
@@ -12,7 +12,7 @@ BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
 BuildRequires:	libid3tag-devel >= 0.15.0b
 BuildRequires:	libmad-devel
-BuildRequires:	libmusicbrainz-devel >= 2.0.0
+BuildRequires:	libmusicbrainz-devel >= 2.1.0
 BuildRequires:	libstdc++-devel >= 2:1.4d
 BuildRequires:	libtool
 BuildRequires:	libvorbis-devel
@@ -29,10 +29,10 @@ Biblioteka znakowania MusicBrainz.
 Summary:	Header files for libtunepimp library
 Summary(pl):	Pliki nag³ówkowe biblioteki libtunepimp
 Group:		Development/Libraries
-Requires:	%{name} = %{version}
+Requires:	%{name} = %{version}-%{release}
 Requires:	libid3tag-devel
 Requires:	libmad-devel
-Requires:	libmusicbrainz-devel
+Requires:	libmusicbrainz-devel >= 2.1.0
 Requires:	libvorbis-devel
 
 %description devel
@@ -45,7 +45,7 @@ Pliki nag³ówkowe biblioteki libtunepimp.
 Summary:	Static libtunepimp library
 Summary(pl):	Statyczna biblioteka libtunepimp
 Group:		Development/Libraries
-Requires:	%{name}-devel = %{version}
+Requires:	%{name}-devel = %{version}-%{release}
 
 %description static
 Static libtunepimp library.
@@ -64,7 +64,6 @@ Statyczna biblioteka libtunepimp.
 %{__autoheader}
 %{__automake}
 %configure
-
 %{__make}
 
 %install
