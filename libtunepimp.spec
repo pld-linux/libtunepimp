@@ -34,6 +34,7 @@ Requires:	%{name} = %{version}-%{release}
 Requires:	libid3tag-devel
 Requires:	libmad-devel
 Requires:	libmusicbrainz-devel >= 2.1.0
+Requires:	libstdc++-devel >= 2:1.4d
 Requires:	libvorbis-devel
 
 %description devel
