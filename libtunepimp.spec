@@ -1,16 +1,17 @@
 Summary:	The MusicBrainz tagging library
 Summary(pl):	Biblioteka znakowania MusicBrainz
 Name:		libtunepimp
-Version:	0.3.0
-Release:	4
+Version:	0.4.0
+Release:	1
 License:	GPL
 Group:		Libraries
 Source0:	ftp://ftp.musicbrainz.org/pub/musicbrainz/%{name}-%{version}.tar.gz
-# Source0-md5:	f1f506914150c4917ec730f847ad4709
+# Source0-md5:	c11c3082ee72896949cb4fdb7acbbf63
 Patch0:		%{name}-readline.patch
-Patch1:		%{name}-include_signal_h.patch
+Patch1:		%{name}-gcc4.patch
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
+BuildRequires:	flac-devel
 BuildRequires:	libid3tag-devel >= 0.15.0b
 BuildRequires:	libmad-devel
 BuildRequires:	libmusicbrainz-devel >= 2.1.0
@@ -76,8 +77,9 @@ rm -rf $RPM_BUILD_ROOT
 	DESTDIR=$RPM_BUILD_ROOT
 
 # not installed, but used by installed headers
-install lib/threads/posix/{mutex,thread,semaphore}.h \
-	lib/{filecache,analyzer,submit,lookup,filelookup,write,trm,metadata,lookuptools}.h \
+install lib/threads/posix/mutex.h \
+	lib/{analyzer,filecache,filelookup,lookup,plugins,readmeta,submit,write}.h \
+	include/tunepimp/metadata.h \
 	$RPM_BUILD_ROOT%{_includedir}/tunepimp
 
 %clean
@@ -90,7 +92,11 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog README.LGPL TODO
 %attr(755,root,root) %{_bindir}/tp_tagger
+%attr(755,root,root) %{_bindir}/trm
 %attr(755,root,root) %{_libdir}/lib*.so.*.*.*
+%dir %{_libdir}/tunepimp
+%dir %{_libdir}/tunepimp/plugins
+%attr(755,root,root) %{_libdir}/tunepimp/plugins/*.tpp
 
 %files devel
 %defattr(644,root,root,755)
