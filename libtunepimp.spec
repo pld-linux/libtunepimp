@@ -1,14 +1,13 @@
 Summary:	The MusicBrainz tagging library
 Summary(pl):	Biblioteka znakowania MusicBrainz
 Name:		libtunepimp
-Version:	0.4.0
+Version:	0.4.1
 Release:	1
 License:	GPL
 Group:		Libraries
 Source0:	ftp://ftp.musicbrainz.org/pub/musicbrainz/%{name}-%{version}.tar.gz
-# Source0-md5:	c11c3082ee72896949cb4fdb7acbbf63
+# Source0-md5:	73bc5b6ce3f03a1323289cd455692493
 Patch0:		%{name}-readline.patch
-Patch1:		%{name}-gcc4.patch
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
 BuildRequires:	flac-devel
@@ -59,7 +58,6 @@ Statyczna biblioteka libtunepimp.
 %prep
 %setup -q
 %patch0 -p1
-%patch1 -p1
 
 %build
 %{__libtoolize}
