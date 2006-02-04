@@ -1,23 +1,23 @@
 Summary:	The MusicBrainz tagging library
 Summary(pl):	Biblioteka znakowania MusicBrainz
 Name:		libtunepimp
-Version:	0.4.1
+Version:	0.4.2
 Release:	1
 License:	GPL
 Group:		Libraries
 Source0:	ftp://ftp.musicbrainz.org/pub/musicbrainz/%{name}-%{version}.tar.gz
-# Source0-md5:	73bc5b6ce3f03a1323289cd455692493
+# Source0-md5:	10b9e4a2f1930aed78ef7ddaebbe0fde
 Patch0:		%{name}-readline.patch
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
 BuildRequires:	flac-devel
-BuildRequires:	libid3tag-devel >= 0.15.0b
 BuildRequires:	libmad-devel
 BuildRequires:	libmusicbrainz-devel >= 2.1.0
 BuildRequires:	libstdc++-devel >= 2:1.4d
 BuildRequires:	libtool
 BuildRequires:	libvorbis-devel
 BuildRequires:	readline-devel
+BuildRequires:	taglib-devel >= 1.4
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -31,11 +31,8 @@ Summary:	Header files for libtunepimp library
 Summary(pl):	Pliki nag³ówkowe biblioteki libtunepimp
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
-Requires:	libid3tag-devel
-Requires:	libmad-devel
 Requires:	libmusicbrainz-devel >= 2.1.0
 Requires:	libstdc++-devel >= 2:1.4d
-Requires:	libvorbis-devel
 
 %description devel
 Header files for libtunepimp library.
@@ -59,6 +56,8 @@ Statyczna biblioteka libtunepimp.
 %setup -q
 %patch0 -p1
 
+sed -i -e 's/AC_CHECK_TAGLIB(1\.4\.0,/AC_CHECK_TAGLIB(1.4,/;s/ -O2//;' configure.in
+
 %build
 %{__libtoolize}
 %{__aclocal}
@@ -74,7 +73,7 @@ rm -rf $RPM_BUILD_ROOT
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-# not installed, but used by installed headers
+# not installed, but used by installed headers (track.h, tunepimp.h)
 install lib/threads/posix/mutex.h \
 	lib/{analyzer,filecache,filelookup,lookup,plugins,readmeta,submit,write}.h \
 	include/tunepimp/metadata.h \
