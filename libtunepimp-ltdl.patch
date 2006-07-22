@@ -1,0 +1,22 @@
+--- libtunepimp-0.5.0/configure.in.orig	2006-07-17 20:48:45.294508000 +0200
++++ libtunepimp-0.5.0/configure.in	2006-07-22 00:00:14.303176250 +0200
+@@ -33,7 +33,7 @@
+ dnl Checks for programs.
+ AC_PREREQ(2.52)
+ AC_PROG_CC
+-AC_LIBLTDL_CONVENIENCE
++AC_LIBLTDL_INSTALLABLE
+ AC_SUBST(INCLTDL)
+ AC_SUBST(LIBLTDL)
+ AC_LIBTOOL_DLOPEN
+--- libtunepimp-0.5.0/lib/plugins.cpp.orig	2004-05-07 00:54:33.000000000 +0200
++++ libtunepimp-0.5.0/lib/plugins.cpp	2006-07-22 00:00:57.393869250 +0200
+@@ -31,7 +31,7 @@
+ #include <string.h>
+ #include <sys/types.h>
+ #include <dirent.h>
+-#include "../libltdl/ltdl.h"
++#include <ltdl.h>
+ #include "plugins.h"
+ 
+ #include <map>
