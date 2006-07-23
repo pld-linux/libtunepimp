@@ -2,7 +2,7 @@ Summary:	The MusicBrainz tagging library
 Summary(pl):	Biblioteka znakowania MusicBrainz
 Name:		libtunepimp
 Version:	0.5.0
-Release:	1
+Release:	2
 License:	GPL
 Group:		Libraries
 Source0:	ftp://ftp.musicbrainz.org/pub/musicbrainz/%{name}-%{version}.tar.gz
@@ -112,6 +112,9 @@ install lib/threads/posix/mutex.h \
 	lib/{analyzer,filecache,plugins,readmeta,write}.h \
 	include/tunepimp-*/metadata.h \
 	$RPM_BUILD_ROOT%{_includedir}/tunepimp-0.5
+
+rm -r $RPM_BUILD_ROOT%{_includedir}/tunepimp
+ln -s tunepimp-0.5 $RPM_BUILD_ROOT%{_includedir}/tunepimp
 
 #cd perl/tunepimp-perl
 #%{__make} install \
