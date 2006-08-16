@@ -1,14 +1,13 @@
 Summary:	The MusicBrainz tagging library
 Summary(pl):	Biblioteka znakowania MusicBrainz
 Name:		libtunepimp
-Version:	0.5.0
-Release:	3
+Version:	0.5.1
+Release:	1
 License:	GPL
 Group:		Libraries
 Source0:	ftp://ftp.musicbrainz.org/pub/musicbrainz/%{name}-%{version}.tar.gz
-# Source0-md5:	2f303ff4fadcf51840e0f5e0e083d146
+# Source0-md5:	51809faed41fb8f12be15846214abc3a
 Patch0:		%{name}-ltdl.patch
-Patch1:		%{name}-fix.patch
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
 BuildRequires:	curl-devel
@@ -78,7 +77,6 @@ Wi±zania Pythona do biblioteki libtunepimp.
 %prep
 %setup -q
 %patch0 -p1
-%patch1 -p1
 
 sed -i -e 's/ -O2//' configure.in
 
@@ -113,7 +111,6 @@ install lib/threads/posix/mutex.h \
 	include/tunepimp-*/metadata.h \
 	$RPM_BUILD_ROOT%{_includedir}/tunepimp-0.5
 
-rm -r $RPM_BUILD_ROOT%{_includedir}/tunepimp
 ln -s tunepimp-0.5 $RPM_BUILD_ROOT%{_includedir}/tunepimp
 
 #cd perl/tunepimp-perl
