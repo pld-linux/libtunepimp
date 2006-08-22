@@ -3,7 +3,7 @@ Summary:	The MusicBrainz tagging library
 Summary(pl):	Biblioteka znakowania MusicBrainz
 Name:		libtunepimp
 Version:	%{_major}.1
-Release:	2
+Release:	3
 License:	GPL
 Group:		Libraries
 Source0:	ftp://ftp.musicbrainz.org/pub/musicbrainz/%{name}-%{version}.tar.gz
@@ -79,7 +79,7 @@ Wi±zania Pythona do biblioteki libtunepimp.
 %setup -q
 %patch0 -p1
 
-sed -i -e 's/ -O2//' configure.in
+%{__sed} -i -e 's/ -O2//' configure.in
 
 %build
 %{__libtoolize}
@@ -112,7 +112,7 @@ install lib/threads/posix/mutex.h \
 	include/tunepimp-*/metadata.h \
 	$RPM_BUILD_ROOT%{_includedir}/tunepimp-%{_major}
 
-ln -s tunepimp-%{_major} $RPM_BUILD_ROOT%{_includedir}/tunepimp
+mv $RPM_BUILD_ROOT%{_includedir}/tunepimp{-%{_major},}
 
 #cd perl/tunepimp-perl
 #%{__make} install \
@@ -133,13 +133,6 @@ rm -rf $RPM_BUILD_ROOT
 %post	-p /sbin/ldconfig
 %postun	-p /sbin/ldconfig
 
-%pre devel
-# includedir is symlink pointing to %{name}-%{_major} since 0.5
-if [ -d %{_includedir}/tunepimp -a ! -L %{_includedir}/tunepimp ]; then
-	mv %{_includedir}/tunepimp{,-%{_major}}
-	ln -s tunepimp-%{_major} %{_includedir}/tunepimp
-fi
-
 %files
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog README.LGPL TODO
@@ -154,7 +147,6 @@ fi
 %attr(755,root,root) %{_libdir}/libtunepimp.so
 %{_libdir}/libtunepimp.la
 %{_includedir}/tunepimp
-%{_includedir}/tunepimp-0.5
 
 %files static
 %defattr(644,root,root,755)
