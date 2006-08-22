@@ -1,8 +1,9 @@
+%define		_major	0.5
 Summary:	The MusicBrainz tagging library
 Summary(pl):	Biblioteka znakowania MusicBrainz
 Name:		libtunepimp
-Version:	0.5.1
-Release:	1
+Version:	%{_major}.1
+Release:	2
 License:	GPL
 Group:		Libraries
 Source0:	ftp://ftp.musicbrainz.org/pub/musicbrainz/%{name}-%{version}.tar.gz
@@ -109,9 +110,9 @@ rm -rf $RPM_BUILD_ROOT
 install lib/threads/posix/mutex.h \
 	lib/{analyzer,filecache,plugins,readmeta,write}.h \
 	include/tunepimp-*/metadata.h \
-	$RPM_BUILD_ROOT%{_includedir}/tunepimp-0.5
+	$RPM_BUILD_ROOT%{_includedir}/tunepimp-%{_major}
 
-ln -s tunepimp-0.5 $RPM_BUILD_ROOT%{_includedir}/tunepimp
+ln -s tunepimp-%{_major} $RPM_BUILD_ROOT%{_includedir}/tunepimp
 
 #cd perl/tunepimp-perl
 #%{__make} install \
@@ -131,6 +132,13 @@ rm -rf $RPM_BUILD_ROOT
 
 %post	-p /sbin/ldconfig
 %postun	-p /sbin/ldconfig
+
+%pre devel
+# includedir is symlink pointing to %{name}-%{_major} since 0.5
+if [ -d %{_includedir}/tunepimp -a ! -L %{_includedir}/tunepimp ]; then
+	mv %{_includedir}/tunepimp{,-%{_major}}
+	ln -s tunepimp-%{_major} %{_includedir}/tunepimp
+fi
 
 %files
 %defattr(644,root,root,755)
