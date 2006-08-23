@@ -41,6 +41,7 @@ Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
 Requires:	libltdl-devel
 Requires:	libmusicbrainz-devel >= 2.1.0
+Requires:	libofa-devel >= 0.4.0
 Requires:	libstdc++-devel >= 2:1.4d
 
 %description devel
