@@ -39,6 +39,8 @@ Summary:	Header files for libtunepimp library
 Summary(pl):	Pliki nag³ówkowe biblioteki libtunepimp
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
+Requires:	curl-devel
+Requires:	expat-devel
 Requires:	libltdl-devel
 Requires:	libmusicbrainz-devel >= 2.1.0
 Requires:	libofa-devel >= 0.4.0
