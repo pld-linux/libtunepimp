@@ -3,7 +3,7 @@ Summary:	The MusicBrainz tagging library
 Summary(pl):	Biblioteka znakowania MusicBrainz
 Name:		libtunepimp
 Version:	%{_major}.1
-Release:	3
+Release:	4
 License:	GPL
 Group:		Libraries
 Source0:	ftp://ftp.musicbrainz.org/pub/musicbrainz/%{name}-%{version}.tar.gz
@@ -70,7 +70,6 @@ Summary(pl):	Wi±zania Pythona do biblioteki libtunepimp
 Group:		Libraries/Python
 %pyrequires_eq	python-libs
 Requires:	%{name} = %{version}-%{release}
-Requires:	python-ctypes
 
 %description -n python-tunepimp
 Python bindings for libtunepimp library.
