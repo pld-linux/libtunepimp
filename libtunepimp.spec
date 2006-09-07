@@ -22,7 +22,7 @@ BuildRequires:	libstdc++-devel >= 2:1.4d
 BuildRequires:	libtool
 BuildRequires:	libvorbis-devel
 BuildRequires:	mpeg4ip-devel
-BuildRequires:	python-devel
+BuildRequires:	python-devel >= 1:2.5
 BuildRequires:	rpm-pythonprov
 BuildRequires:	taglib-devel >= 1.4
 BuildRequires:	zlib-devel
