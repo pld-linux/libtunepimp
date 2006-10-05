@@ -1,23 +1,31 @@
 Summary:	The MusicBrainz tagging library
 Summary(pl):	Biblioteka znakowania MusicBrainz
 Name:		libtunepimp
-Version:	0.3.0
-Release:	4
+%define		_major	0.5
+Version:	%{_major}.2
+Release:	1
 License:	GPL
 Group:		Libraries
 Source0:	ftp://ftp.musicbrainz.org/pub/musicbrainz/%{name}-%{version}.tar.gz
-# Source0-md5:	f1f506914150c4917ec730f847ad4709
-Patch0:		%{name}-readline.patch
-Patch1:		%{name}-include_signal_h.patch
+# Source0-md5:	655b254539013f5e7fe50ac035c26dcb
+Patch0:		%{name}-ltdl.patch
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
-BuildRequires:	libid3tag-devel >= 0.15.0b
+BuildRequires:	curl-devel
+BuildRequires:	expat-devel
+BuildRequires:	flac-devel
+BuildRequires:	libltdl-devel
 BuildRequires:	libmad-devel
 BuildRequires:	libmusicbrainz-devel >= 2.1.0
+BuildRequires:	libofa-devel >= 0.4.0
 BuildRequires:	libstdc++-devel >= 2:1.4d
 BuildRequires:	libtool
 BuildRequires:	libvorbis-devel
-BuildRequires:	readline-devel
+BuildRequires:	mpeg4ip-devel
+BuildRequires:	python-devel >= 1:2.5
+BuildRequires:	rpm-pythonprov
+BuildRequires:	taglib-devel >= 1.4
+BuildRequires:	zlib-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -31,11 +39,12 @@ Summary:	Header files for libtunepimp library
 Summary(pl):	Pliki nag³ówkowe biblioteki libtunepimp
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
-Requires:	libid3tag-devel
-Requires:	libmad-devel
+Requires:	curl-devel
+Requires:	expat-devel
+Requires:	libltdl-devel
 Requires:	libmusicbrainz-devel >= 2.1.0
+Requires:	libofa-devel >= 0.4.0
 Requires:	libstdc++-devel >= 2:1.4d
-Requires:	libvorbis-devel
 
 %description devel
 Header files for libtunepimp library.
@@ -55,10 +64,24 @@ Static libtunepimp library.
 %description static -l pl
 Statyczna biblioteka libtunepimp.
 
+%package -n python-tunepimp
+Summary:	Python bindings for libtunepimp library
+Summary(pl):	Wi±zania Pythona do biblioteki libtunepimp
+Group:		Libraries/Python
+%pyrequires_eq	python-libs
+Requires:	%{name} = %{version}-%{release}
+
+%description -n python-tunepimp
+Python bindings for libtunepimp library.
+
+%description -n python-tunepimp -l pl
+Wi±zania Pythona do biblioteki libtunepimp.
+
 %prep
 %setup -q
 %patch0 -p1
-%patch1 -p1
+
+%{__sed} -i -e 's/ -O2//' configure.in
 
 %build
 %{__libtoolize}
@@ -69,16 +92,40 @@ Statyczna biblioteka libtunepimp.
 %configure
 %{__make}
 
+# perl bindings are not updated to current API
+#cd perl/tunepimp-perl
+#%{__perl} Makefile.PL \
+#	OPTIMIZE="%{rpmcflags}"
+#%{__make}
+# cd ../..
+
+cd python
+python setup.py build
+
 %install
 rm -rf $RPM_BUILD_ROOT
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-# not installed, but used by installed headers
-install lib/threads/posix/{mutex,thread,semaphore}.h \
-	lib/{filecache,analyzer,submit,lookup,filelookup,write,trm,metadata,lookuptools}.h \
-	$RPM_BUILD_ROOT%{_includedir}/tunepimp
+# not installed, but used by installed headers (track.h, tunepimp.h)
+install lib/threads/posix/mutex.h \
+	lib/{analyzer,filecache,plugins,readmeta,write}.h \
+	include/tunepimp-*/metadata.h \
+	$RPM_BUILD_ROOT%{_includedir}/tunepimp-%{_major}
+
+#cd perl/tunepimp-perl
+#%{__make} install \
+#	DESTDIR=$RPM_BUILD_ROOT
+#install -D examples/tp_tagger.pl $RPM_BUILD_ROOT%{_bindir}/tp_tagger
+# cd ../..
+
+cd python
+python setup.py install \
+	--root=$RPM_BUILD_ROOT \
+	--optimize=2
+%py_postclean
+install -D examples/trm.py $RPM_BUILD_ROOT%{_bindir}/trm
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -89,15 +136,25 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog README.LGPL TODO
-%attr(755,root,root) %{_bindir}/tp_tagger
-%attr(755,root,root) %{_libdir}/lib*.so.*.*.*
+%attr(755,root,root) %{_bindir}/puid
+%attr(755,root,root) %{_libdir}/libtunepimp.so.*.*.*
+%dir %{_libdir}/tunepimp
+%dir %{_libdir}/tunepimp/plugins
+%attr(755,root,root) %{_libdir}/tunepimp/plugins/*.tpp
 
 %files devel
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/lib*.so
-%{_libdir}/lib*.la
-%{_includedir}/tunepimp
+%attr(755,root,root) %{_libdir}/libtunepimp.so
+%{_libdir}/libtunepimp.la
+%{_includedir}/tunepimp-%{_major}
 
 %files static
 %defattr(644,root,root,755)
-%{_libdir}/lib*.a
+%{_libdir}/libtunepimp.a
+
+%files -n python-tunepimp
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/trm
+%dir %{py_sitescriptdir}/tunepimp
+%{py_sitescriptdir}/tunepimp/*.py[co]
+%{py_sitescriptdir}/*.egg-info
