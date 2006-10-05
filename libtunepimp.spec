@@ -2,12 +2,12 @@ Summary:	The MusicBrainz tagging library
 Summary(pl):	Biblioteka znakowania MusicBrainz
 Name:		libtunepimp
 %define		_major	0.5
-Version:	%{_major}.1
-Release:	6
+Version:	%{_major}.2
+Release:	1
 License:	GPL
 Group:		Libraries
 Source0:	ftp://ftp.musicbrainz.org/pub/musicbrainz/%{name}-%{version}.tar.gz
-# Source0-md5:	51809faed41fb8f12be15846214abc3a
+# Source0-md5:	655b254539013f5e7fe50ac035c26dcb
 Patch0:		%{name}-ltdl.patch
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
@@ -157,3 +157,4 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/trm
 %dir %{py_sitescriptdir}/tunepimp
 %{py_sitescriptdir}/tunepimp/*.py[co]
+%{py_sitescriptdir}/*.egg-info
