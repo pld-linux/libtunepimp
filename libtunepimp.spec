@@ -22,7 +22,7 @@ BuildRequires:	libstdc++-devel >= 2:1.4d
 BuildRequires:	libtool
 BuildRequires:	libvorbis-devel
 BuildRequires:	mpeg4ip-devel
-BuildRequires:	python-devel >= 1:2.5
+BuildRequires:	python-devel >= 1:2.4
 BuildRequires:	rpm-pythonprov
 BuildRequires:	taglib-devel >= 1.4
 BuildRequires:	zlib-devel
@@ -157,4 +157,3 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/trm
 %dir %{py_sitescriptdir}/tunepimp
 %{py_sitescriptdir}/tunepimp/*.py[co]
-%{py_sitescriptdir}/*.egg-info
