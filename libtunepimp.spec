@@ -1,5 +1,5 @@
 Summary:	The MusicBrainz tagging library
-Summary(pl.UTF-8):   Biblioteka znakowania MusicBrainz
+Summary(pl.UTF-8):	Biblioteka znakowania MusicBrainz
 Name:		libtunepimp
 %define		_major	0.5
 Version:	%{_major}.3
@@ -36,7 +36,7 @@ Biblioteka znakowania MusicBrainz.
 
 %package devel
 Summary:	Header files for libtunepimp library
-Summary(pl.UTF-8):   Pliki nagłówkowe biblioteki libtunepimp
+Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki libtunepimp
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
 Requires:	curl-devel
@@ -54,7 +54,7 @@ Pliki nagłówkowe biblioteki libtunepimp.
 
 %package static
 Summary:	Static libtunepimp library
-Summary(pl.UTF-8):   Statyczna biblioteka libtunepimp
+Summary(pl.UTF-8):	Statyczna biblioteka libtunepimp
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
 
@@ -66,7 +66,7 @@ Statyczna biblioteka libtunepimp.
 
 %package -n python-tunepimp
 Summary:	Python bindings for libtunepimp library
-Summary(pl.UTF-8):   Wiązania Pythona do biblioteki libtunepimp
+Summary(pl.UTF-8):	Wiązania Pythona do biblioteki libtunepimp
 Group:		Libraries/Python
 %pyrequires_eq	python-libs
 Requires:	%{name} = %{version}-%{release}
