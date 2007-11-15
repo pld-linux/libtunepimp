@@ -3,12 +3,13 @@ Summary(pl.UTF-8):	Biblioteka znakowania MusicBrainz
 Name:		libtunepimp
 %define		_major	0.5
 Version:	%{_major}.3
-Release:	6
+Release:	7
 License:	GPL
 Group:		Libraries
 Source0:	ftp://ftp.musicbrainz.org/pub/musicbrainz/%{name}-%{version}.tar.gz
 # Source0-md5:	09649f983acef679a548344ba7a9bb2f
 Patch0:		%{name}-ltdl.patch
+Patch1:		%{name}-mpeg4ip.patch
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
 BuildRequires:	curl-devel
@@ -21,7 +22,7 @@ BuildRequires:	libofa-devel >= 0.4.0
 BuildRequires:	libstdc++-devel >= 2:1.4d
 BuildRequires:	libtool
 BuildRequires:	libvorbis-devel
-BuildRequires:	mpeg4ip-devel
+BuildRequires:	mpeg4ip-devel >= 1.6
 BuildRequires:	python-devel >= 1:2.5
 BuildRequires:	rpm-pythonprov
 BuildRequires:	taglib-devel >= 1.4
@@ -80,6 +81,7 @@ Wiązania Pythona do biblioteki libtunepimp.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 %{__sed} -i -e 's/ -O2//' configure.in
 
