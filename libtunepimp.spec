@@ -140,6 +140,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS ChangeLog README.LGPL TODO
 %attr(755,root,root) %{_bindir}/puid
 %attr(755,root,root) %{_libdir}/libtunepimp.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libtunepimp.so.5
 %dir %{_libdir}/tunepimp
 %dir %{_libdir}/tunepimp/plugins
 %attr(755,root,root) %{_libdir}/tunepimp/plugins/*.tpp
