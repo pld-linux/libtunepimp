@@ -1,5 +1,5 @@
 Summary:	The MusicBrainz tagging library
-Summary(pl):	Biblioteka znakowania MusicBrainz
+Summary(pl.UTF-8):	Biblioteka znakowania MusicBrainz
 Name:		libtunepimp
 %define		_major	0.5
 Version:	%{_major}.3
@@ -31,12 +31,12 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %description
 The MusicBrainz tagging library.
 
-%description -l pl
+%description -l pl.UTF-8
 Biblioteka znakowania MusicBrainz.
 
 %package devel
 Summary:	Header files for libtunepimp library
-Summary(pl):	Pliki nag³ówkowe biblioteki libtunepimp
+Summary(pl.UTF-8):	Pliki nagÅ‚Ã³wkowe biblioteki libtunepimp
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
 Requires:	curl-devel
@@ -49,24 +49,24 @@ Requires:	libstdc++-devel >= 2:1.4d
 %description devel
 Header files for libtunepimp library.
 
-%description devel -l pl
-Pliki nag³ówkowe biblioteki libtunepimp.
+%description devel -l pl.UTF-8
+Pliki nagÅ‚Ã³wkowe biblioteki libtunepimp.
 
 %package static
 Summary:	Static libtunepimp library
-Summary(pl):	Statyczna biblioteka libtunepimp
+Summary(pl.UTF-8):	Statyczna biblioteka libtunepimp
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
 
 %description static
 Static libtunepimp library.
 
-%description static -l pl
+%description static -l pl.UTF-8
 Statyczna biblioteka libtunepimp.
 
 %package -n python-tunepimp
 Summary:	Python bindings for libtunepimp library
-Summary(pl):	Wi±zania Pythona do biblioteki libtunepimp
+Summary(pl.UTF-8):	WiÄ…zania Pythona do biblioteki libtunepimp
 Group:		Libraries/Python
 %pyrequires_eq	python-libs
 Requires:	%{name} = %{version}-%{release}
@@ -74,8 +74,8 @@ Requires:	%{name} = %{version}-%{release}
 %description -n python-tunepimp
 Python bindings for libtunepimp library.
 
-%description -n python-tunepimp -l pl
-Wi±zania Pythona do biblioteki libtunepimp.
+%description -n python-tunepimp -l pl.UTF-8
+WiÄ…zania Pythona do biblioteki libtunepimp.
 
 %prep
 %setup -q
