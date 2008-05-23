@@ -3,7 +3,7 @@ Summary(pl.UTF-8):	Biblioteka znakowania MusicBrainz
 Name:		libtunepimp
 %define		_major	0.5
 Version:	%{_major}.3
-Release:	7
+Release:	8
 License:	GPL
 Group:		Libraries
 Source0:	ftp://ftp.musicbrainz.org/pub/musicbrainz/%{name}-%{version}.tar.gz
@@ -83,7 +83,8 @@ Wiązania Pythona do biblioteki libtunepimp.
 %patch0 -p1
 %patch1 -p1
 
-%{__sed} -i -e 's/ -O2//' configure.in
+%{__sed} -i 's/ -O2//' configure.in
+%{__sed} -i 's/lt_dlhandle_struct \*/lt_dlhandle/' lib/plugins.cpp
 
 %build
 %{__libtoolize}
@@ -91,7 +92,10 @@ Wiązania Pythona do biblioteki libtunepimp.
 %{__autoconf}
 %{__autoheader}
 %{__automake}
-%configure
+
+%configure \
+	--enable-ltdl-install=no
+
 %{__make}
 
 # perl bindings are not updated to current API
