@@ -1,0 +1,12 @@
+--- libtunepimp-0.5.3/lib/fileio.cpp~	2009-08-25 18:06:48.000000000 +0300
++++ libtunepimp-0.5.3/lib/fileio.cpp	2009-08-25 18:08:42.916044219 +0300
+@@ -124,7 +124,8 @@
+ 
+ void tmktempname(const char *path, char *newPath, int newPathLen)
+ {
+-    char *ptr, *temp;
++    const char *ptr;
++    char *temp;
+ 
+     temp = (char *)malloc(strlen(path) + 32);
+     ptr = strrchr(path, dirSepChar);

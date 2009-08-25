@@ -11,6 +11,7 @@ Source0:	ftp://ftp.musicbrainz.org/pub/musicbrainz/%{name}-%{version}.tar.gz
 Patch0:		%{name}-ltdl.patch
 Patch1:		%{name}-mpeg4ip.patch
 Patch2:		%{name}-gcc43.patch
+Patch3:		gcc44.patch
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
 BuildRequires:	curl-devel
@@ -84,6 +85,7 @@ Wiązania Pythona do biblioteki libtunepimp.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %{__sed} -i 's/ -O2//' configure.in
 %{__sed} -i 's/lt_dlhandle_struct \*/lt_dlhandle/' lib/plugins.cpp
