@@ -3,7 +3,7 @@ Summary:	The MusicBrainz tagging library
 Summary(pl.UTF-8):	Biblioteka znakowania MusicBrainz
 Name:		libtunepimp
 Version:	%{major}.3
-Release:	12
+Release:	13
 License:	GPL
 Group:		Libraries
 Source0:	ftp://ftp.musicbrainz.org/pub/musicbrainz/%{name}-%{version}.tar.gz
