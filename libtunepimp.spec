@@ -1,9 +1,13 @@
+# TODO: port to standalone mp4v2
+
+%bcond_with	mp4v2		# build with mp4v2 support
+
 %define		major	0.5
 Summary:	The MusicBrainz tagging library
 Summary(pl.UTF-8):	Biblioteka znakowania MusicBrainz
 Name:		libtunepimp
 Version:	%{major}.3
-Release:	15
+Release:	16
 License:	GPL
 Group:		Libraries
 Source0:	ftp://ftp.musicbrainz.org/pub/musicbrainz/%{name}-%{version}.tar.gz
@@ -24,7 +28,7 @@ BuildRequires:	libofa-devel >= 0.4.0
 BuildRequires:	libstdc++-devel >= 2:1.4d
 BuildRequires:	libtool
 BuildRequires:	libvorbis-devel
-BuildRequires:	mpeg4ip-devel >= 1.6
+%{?with_mp4v2:BuildRequires:	mp4v2-devel}
 BuildRequires:	python-devel >= 1:2.5
 BuildRequires:	rpm-pythonprov
 BuildRequires:	taglib-devel >= 1.4
@@ -83,9 +87,9 @@ Wiązania Pythona do biblioteki libtunepimp.
 %prep
 %setup -q
 %patch0 -p1
-%patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch1 -p1
 
 %{__sed} -i 's/ -O2//' configure.in
 %{__sed} -i 's/lt_dlhandle_struct \*/lt_dlhandle/' lib/plugins.cpp
@@ -98,6 +102,7 @@ Wiązania Pythona do biblioteki libtunepimp.
 %{__automake}
 
 %configure \
+	%{!?with_mp4v2:ac_cv_lib_mp4v2_MP4Read=false} \
 	--enable-ltdl-install=no
 
 %{__make}
