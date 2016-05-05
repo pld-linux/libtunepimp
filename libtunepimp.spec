@@ -7,7 +7,7 @@ Summary:	The MusicBrainz tagging library
 Summary(pl.UTF-8):	Biblioteka znakowania MusicBrainz
 Name:		libtunepimp
 Version:	%{major}.3
-Release:	18
+Release:	19
 License:	GPL
 Group:		Libraries
 Source0:	ftp://ftp.musicbrainz.org/pub/musicbrainz/%{name}-%{version}.tar.gz
@@ -115,7 +115,7 @@ Wiązania Pythona do biblioteki libtunepimp.
 # cd ../..
 
 cd python
-python setup.py build
+%py_build
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -136,9 +136,7 @@ install lib/threads/posix/mutex.h \
 # cd ../..
 
 cd python
-python setup.py install \
-	--root=$RPM_BUILD_ROOT \
-	--optimize=2
+%py_install
 %py_postclean
 install -D examples/trm.py $RPM_BUILD_ROOT%{_bindir}/trm
 
