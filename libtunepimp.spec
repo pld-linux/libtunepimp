@@ -1,5 +1,6 @@
 # TODO: port to standalone mp4v2
-
+#
+# Conditional build:
 %bcond_with	mp4v2		# build with mp4v2 support
 
 %define		major	0.5
@@ -7,15 +8,16 @@ Summary:	The MusicBrainz tagging library
 Summary(pl.UTF-8):	Biblioteka znakowania MusicBrainz
 Name:		libtunepimp
 Version:	%{major}.3
-Release:	19
-License:	GPL
+Release:	20
+License:	GPL v2+
 Group:		Libraries
-Source0:	ftp://ftp.musicbrainz.org/pub/musicbrainz/%{name}-%{version}.tar.gz
+Source0:	http://ftp.musicbrainz.org/pub/musicbrainz/historical/%{name}-%{version}.tar.gz
 # Source0-md5:	09649f983acef679a548344ba7a9bb2f
 Patch0:		%{name}-ltdl.patch
 Patch1:		%{name}-mpeg4ip.patch
 Patch2:		%{name}-gcc43.patch
 Patch3:		gcc44.patch
+URL:		https://wiki.musicbrainz.org/libtunepimp
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
 BuildRequires:	curl-devel
@@ -31,6 +33,7 @@ BuildRequires:	libvorbis-devel
 %{?with_mp4v2:BuildRequires:	mp4v2-devel}
 BuildRequires:	python-devel >= 1:2.5
 BuildRequires:	rpm-pythonprov
+BuildRequires:	sed >= 4.0
 BuildRequires:	taglib-devel >= 1.4
 BuildRequires:	zlib-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -93,6 +96,7 @@ Wiązania Pythona do biblioteki libtunepimp.
 
 %{__sed} -i 's/ -O2//' configure.in
 %{__sed} -i 's/lt_dlhandle_struct \*/lt_dlhandle/' lib/plugins.cpp
+%{__sed} -i -e '1s,/usr/bin/env python,%{__python},' python/examples/trm.py
 
 %build
 %{__libtoolize}
@@ -100,10 +104,9 @@ Wiązania Pythona do biblioteki libtunepimp.
 %{__autoconf}
 %{__autoheader}
 %{__automake}
-
 %configure \
 	%{!?with_mp4v2:ac_cv_lib_mp4v2_MP4Read=false} \
-	--enable-ltdl-install=no
+	--disable-ltdl-install
 
 %{__make}
 
@@ -138,7 +141,7 @@ install lib/threads/posix/mutex.h \
 cd python
 %py_install
 %py_postclean
-install -D examples/trm.py $RPM_BUILD_ROOT%{_bindir}/trm
+install -Dp examples/trm.py $RPM_BUILD_ROOT%{_bindir}/trm
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -171,4 +174,4 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/trm
 %dir %{py_sitescriptdir}/tunepimp
 %{py_sitescriptdir}/tunepimp/*.py[co]
-%{py_sitescriptdir}/*.egg-info
+%{py_sitescriptdir}/tunepimp-%{version}-py*.egg-info
