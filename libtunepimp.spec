@@ -1,20 +1,19 @@
-# TODO: port to standalone mp4v2
 #
 # Conditional build:
-%bcond_with	mp4v2		# build with mp4v2 support
+%bcond_without	mp4v2		# mp4v2 support
 
 %define		major	0.5
 Summary:	The MusicBrainz tagging library
 Summary(pl.UTF-8):	Biblioteka znakowania MusicBrainz
 Name:		libtunepimp
 Version:	%{major}.3
-Release:	20
+Release:	21
 License:	GPL v2+
 Group:		Libraries
 Source0:	http://ftp.musicbrainz.org/pub/musicbrainz/historical/%{name}-%{version}.tar.gz
 # Source0-md5:	09649f983acef679a548344ba7a9bb2f
 Patch0:		%{name}-ltdl.patch
-Patch1:		%{name}-mpeg4ip.patch
+Patch1:		%{name}-mp4v2.patch
 Patch2:		%{name}-gcc43.patch
 Patch3:		gcc44.patch
 URL:		https://wiki.musicbrainz.org/libtunepimp

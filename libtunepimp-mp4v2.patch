@@ -1,0 +1,355 @@
+--- libtunepimp-0.5.3/plugins/mp4/mp4.cpp.orig	2020-11-25 06:34:36.728698744 +0100
++++ libtunepimp-0.5.3/plugins/mp4/mp4.cpp	2020-11-27 22:41:42.158210090 +0100
+@@ -28,7 +28,7 @@
+ #include <string.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+-#include <mp4.h>
++#include <mp4v2/mp4v2.h>
+ #include "metadata.h"
+ #include "plugin.h"
+ #ifndef WIN32
+@@ -44,7 +44,7 @@
+ #define PLUGIN_VERSION "1.0.0"
+ #define PLUGIN_NAME    "MP4 metadata reader/writer"
+ 
+-static char *formats[][2] = {
++static const char *formats[][2] = {
+   { ".aac", "AAC/MP4" },
+   { ".mp4", "MP4" },
+   { ".m4a", "MP4" },
+@@ -54,13 +54,11 @@
+ 
+ #define NUM_FORMATS 5
+ 
+-static char *errorString = "";
++static const char *errorString = "";
+ 
+ static void
+ mp4Shutdown()
+ {
+-  if (strlen(errorString))
+-    free(errorString);
+ }
+ 
+ static const char *
+@@ -101,14 +99,50 @@
+   return errorString;
+ }
+ 
++static MP4ItmfItemList*
++mp4GetItmfItemValue(MP4FileHandle mp4file, const char *tagName, const char **value)
++{
++  MP4ItmfItemList *items = MP4ItmfGetItemsByMeaning(mp4file, "com.apple.iTunes", tagName);
++  if (items != NULL) {
++    if (items->size == 0) {
++      MP4ItmfItemListFree(items);
++      return NULL;
++    }
++    if (items->elements[0].dataList.size == 0) {
++      MP4ItmfItemListFree(items);
++      return NULL;
++    }
++    *value = reinterpret_cast<const char*>(items->elements[0].dataList.elements[0].value);
++  }
++  return items;
++}
++
++void
++mp4SetItmfItemValue(MP4FileHandle mp4file, const char *tagName, const char *value, size_t size)
++{
++  MP4ItmfItemList *items = MP4ItmfGetItemsByMeaning(mp4file, "com.apple.iTunes", tagName);
++  if (items != NULL) {
++    for (size_t idx = 0; idx < items->size; idx++)
++      MP4ItmfRemoveItem(mp4file, items->elements + idx);
++    MP4ItmfItemListFree(items);
++  }
++
++  MP4ItmfItem *item = MP4ItmfItemAlloc("----", 1);
++  item->mean = strdup("com.apple.iTunes");
++  item->name = strdup(tagName);
++  item->dataList.elements[0].typeCode = MP4_ITMF_BT_UTF8;
++  item->dataList.elements[0].valueSize = size;
++  item->dataList.elements[0].value = (uint8_t*)malloc(size);
++  memcpy(item->dataList.elements[0].value, value, size);
++  MP4ItmfAddItem(mp4file, item);
++}
++
+ static int
+ mp4ReadMetadata(metadata_t *mdata, const char *fileName, int flags, const char *encoding)
+ {
+-  char *value;
+-  u_int16_t numval, numval2;
+-  u_int8_t numval3;
+-  u_int32_t size;
+   MP4FileHandle mp4file;
++  MP4ItmfItemList *items;
++  const char *value;
+   
+ #ifndef WIN32
+   mp4file = MP4Read(utf8ToEncoding(fileName, encoding).c_str());
+@@ -120,95 +154,100 @@
+     return 0;
+  
+   memset(mdata, 0, sizeof(metadata_t));
+-  
+-  if (MP4GetMetadataName(mp4file, &value) && value != NULL) {
+-    strcpy(mdata->track, value);
+-    free(value);
+-  }
+ 
+-  if (MP4GetMetadataArtist(mp4file, &value) && value != NULL) {
+-    strcpy(mdata->artist, value);
+-    free(value);
+-  }
++  const MP4Tags *tags = MP4TagsAlloc();
++  if (MP4TagsFetch(tags, mp4file)) {
++    if (tags->name)
++      strcpy(mdata->track, tags->name);
++
++    if (tags->artist)
++      strcpy(mdata->artist, tags->artist);
++
++    if (tags->releaseDate)
++      mdata->releaseYear = atoi(tags->releaseDate); // ignore errors, so will stop on "-" after YYYY[-MM-DD]
++
++    if (tags->album)
++      strcpy(mdata->album, tags->album);
++
++    if (tags->track) {
++      mdata->trackNum = tags->track->index;
++      mdata->totalInSet = tags->track->total;
++    }
+ 
+-  if (MP4GetMetadataYear(mp4file, &value) && value != NULL) {
+-    mdata->releaseYear = strtol(value, NULL, 0);
+-    free(value);
+-  }
++    if (tags->compilation)
++      mdata->variousArtist = *(tags->compilation);
+ 
+-  if (MP4GetMetadataAlbum(mp4file, &value) && value != NULL) {
+-    strcpy(mdata->album, value);
+-    free(value);
+-  }  
+-  
+-  if (MP4GetMetadataTrack(mp4file, &numval, &numval2)) {
+-    mdata->trackNum = numval;
+-    mdata->totalInSet = numval2;
++    MP4TagsFree(tags);
+   }
+ 
+-  if (MP4GetMetadataFreeForm(mp4file, "MusicBrainz Sortname", (u_int8_t **)&value, &size) && value != NULL) {
++  if ((items = mp4GetItmfItemValue(mp4file, "MusicBrainz Sortname", &value)) != NULL) {
+     strcpy(mdata->sortName, value);
+-    free(value);
++    MP4ItmfItemListFree(items);
+   }
+   
+-  if (MP4GetMetadataFreeForm(mp4file, "MusicBrainz Track Id", (u_int8_t **)&value, &size) && value != NULL) {
++  if ((items = mp4GetItmfItemValue(mp4file, "MusicBrainz Track Id", &value)) != NULL) {
+     strcpy(mdata->trackId, value);
+-    free(value);
++    MP4ItmfItemListFree(items);
+   }
+   
+-  if (MP4GetMetadataFreeForm(mp4file, "MusicBrainz Album Id", (u_int8_t **)&value, &size) && value != NULL) {
++  if ((items = mp4GetItmfItemValue(mp4file, "MusicBrainz Album Id", &value)) != NULL) {
+     strcpy(mdata->albumId, value);
+-    free(value);
++    MP4ItmfItemListFree(items);
+   }
+   
+-  if (MP4GetMetadataFreeForm(mp4file, "MusicBrainz Artist Id", (u_int8_t **)&value, &size) && value != NULL) {
++  if ((items = mp4GetItmfItemValue(mp4file, "MusicBrainz Artist Id", &value)) != NULL) {
+     strcpy(mdata->artistId, value);
+-    free(value);
++    MP4ItmfItemListFree(items);
+   }
+-
+-  if (MP4GetMetadataFreeForm(mp4file, "MusicIP PUID", (u_int8_t **)&value, &size) && value != NULL) {
++  
++  if ((items = mp4GetItmfItemValue(mp4file, "MusicIP PUID", &value)) != NULL) {
+     strcpy(mdata->filePUID, value);
+-    free(value);
++    MP4ItmfItemListFree(items);
+   }
+   
+-  if (MP4GetMetadataFreeForm(mp4file, "MusicBrainz Album Artist Id", (u_int8_t **)&value, &size) && value != NULL) {
++  if ((items = mp4GetItmfItemValue(mp4file, "MusicBrainz Album Artist Id", &value)) != NULL) {
+     strcpy(mdata->albumArtistId, value);
+-    free(value);
++    MP4ItmfItemListFree(items);
+   }
+   
+-  if (MP4GetMetadataFreeForm(mp4file, "MusicBrainz Album Artist Sortname", (u_int8_t **)&value, &size) && value != NULL) {
++  if ((items = mp4GetItmfItemValue(mp4file, "MusicBrainz Album Artist Sortname", &value)) != NULL) {
+     strcpy(mdata->albumArtistSortName, value);
+-    free(value);
++    MP4ItmfItemListFree(items);
+   }
+   
+-  if (MP4GetMetadataFreeForm(mp4file, "MusicBrainz Album Artist", (u_int8_t **)&value, &size) && value != NULL) {
++  if ((items = mp4GetItmfItemValue(mp4file, "MusicBrainz Album Artist", &value)) != NULL) {
+     strcpy(mdata->albumArtist, value);
+-    free(value);
++    MP4ItmfItemListFree(items);
+   }
+   
+-  if (MP4GetMetadataFreeForm(mp4file, "MusicBrainz Album Type", (u_int8_t **)&value, &size) && value != NULL) {
++  if ((items = mp4GetItmfItemValue(mp4file, "MusicBrainz Album Type", &value)) != NULL) {
+     mdata->albumType = convertToAlbumType(value);
+-    free(value);
++    MP4ItmfItemListFree(items);
+   }
+-    
+-  if (MP4GetMetadataFreeForm(mp4file, "MusicBrainz Album Status", (u_int8_t **)&value, &size) && value != NULL) {
++  
++  if ((items = mp4GetItmfItemValue(mp4file, "MusicBrainz Album Status", &value)) != NULL) {
+     mdata->albumStatus = convertToAlbumStatus(value);
+-    free(value);
++    MP4ItmfItemListFree(items);
+   }
+-    
+-  if (MP4GetMetadataFreeForm(mp4file, "MusicBrainz Album Release Date", (u_int8_t **)&value, &size) && value != NULL) {
++  
++  if ((items = mp4GetItmfItemValue(mp4file, "MusicBrainz Album Release Date", &value)) != NULL) {
+     int year = 0, month = 0, day = 0;
+     if (sscanf(value, "%04d-%02d-%02d", &year, &month, &day) > 0) {
+       mdata->releaseYear  = year;
+       mdata->releaseMonth = month;
+       mdata->releaseDay   = day;
+     }
+-    free(value);
++    MP4ItmfItemListFree(items);
+   }
+   
+-  if (MP4GetMetadataFreeForm(mp4file, "MusicBrainz Album Release Country", (u_int8_t **)&value, &size) && value != NULL) {
++  if ((items = mp4GetItmfItemValue(mp4file, "MusicBrainz Album Release Country", &value)) != NULL) {
+     strcpy(mdata->releaseCountry, value);
+-    free(value);
++    MP4ItmfItemListFree(items);
++  }
++  
++  if ((items = mp4GetItmfItemValue(mp4file, "MusicBrainz Non-Album", &value)) != NULL) {
++    mdata->nonAlbum = atoi(value);
++    MP4ItmfItemListFree(items);
+   }
+   
+   u_int32_t numTracks = MP4GetNumberOfTracks(mp4file);
+@@ -221,19 +260,9 @@
+     }
+   }  
+ 
+-  if (MP4GetMetadataCompilation(mp4file, &numval3)) {
+-    mdata->variousArtist = numval3;
+-  }
+-  
+-  if (MP4GetMetadataFreeForm(mp4file, "MusicBrainz Non-Album", (u_int8_t **)&value, &size) && value != NULL) {
+-    mdata->nonAlbum = atoi(value);
+-    free(value);
+-  }
+-  
+   strcpy(mdata->fileFormat, fileName + strlen(fileName) - 3); 
+   
+-  if (!MP4Close(mp4file))
+-    return 0;
++  MP4Close(mp4file);
+   
+   return 1;
+ }
+@@ -255,41 +284,54 @@
+   if (mp4file == MP4_INVALID_FILE_HANDLE)
+     return 0;
+ 
+-  if ((flags & TP_PLUGIN_FLAGS_GENERAL_CLEAR_TAGS) != 0)
+-    MP4MetadataDelete(mp4file);
+-  
+-  MP4SetMetadataName(mp4file, mdata->track);
++  if ((flags & TP_PLUGIN_FLAGS_GENERAL_CLEAR_TAGS) != 0) {
++    MP4ItmfItemList* items = MP4ItmfGetItems(mp4file);
++    if (items != NULL) {
++      for (size_t idx = 0; idx < items->size; idx++)
++        MP4ItmfRemoveItem(mp4file, items->elements + idx);
++      MP4ItmfItemListFree(items);
++    }
++  }
++
++  const MP4Tags* mp4tags = MP4TagsAlloc();
++  if (MP4TagsFetch(mp4tags, mp4file)) {
++    MP4TagsSetName(mp4tags, mdata->track);
+   
+-  MP4SetMetadataArtist(mp4file, mdata->artist);
++    MP4TagsSetArtist(mp4tags, mdata->artist);
+   
+   sprintf(temp, "%04d", mdata->releaseYear);
+-  MP4SetMetadataYear(mp4file, temp);
++    MP4TagsSetReleaseDate(mp4tags, temp);
+   
+-  MP4SetMetadataAlbum(mp4file, mdata->album);
++    MP4TagsSetAlbum(mp4tags, mdata->album);
+   
+-  MP4SetMetadataTrack(mp4file, mdata->trackNum, mdata->totalInSet);
++    MP4TagTrack tagTrack = {mdata->trackNum, mdata->totalInSet};
++    MP4TagsSetTrack(mp4tags, &tagTrack);
++
++    uint8_t compilation = mdata->variousArtist ? 1 : 0;
++    MP4TagsSetCompilation(mp4tags, &compilation);
++  }
+   
+-  MP4SetMetadataFreeForm(mp4file, "MusicBrainz Sortname", (u_int8_t *)mdata->sortName, strlen(mdata->sortName) + 1);
++  mp4SetItmfItemValue(mp4file, "MusicBrainz Sortname", mdata->sortName, strlen(mdata->sortName) + 1);
+   
+-  MP4SetMetadataFreeForm(mp4file, "MusicBrainz Track Id", (u_int8_t *)mdata->trackId, strlen(mdata->trackId) + 1);
++  mp4SetItmfItemValue(mp4file, "MusicBrainz Track Id", mdata->trackId, strlen(mdata->trackId) + 1);
+   
+-  MP4SetMetadataFreeForm(mp4file, "MusicBrainz Album Id", (u_int8_t *)mdata->albumId, strlen(mdata->albumId) + 1);
++  mp4SetItmfItemValue(mp4file, "MusicBrainz Album Id", mdata->albumId, strlen(mdata->albumId) + 1);
+   
+-  MP4SetMetadataFreeForm(mp4file, "MusicBrainz Artist Id", (u_int8_t *)mdata->artistId, strlen(mdata->artistId) + 1);
++  mp4SetItmfItemValue(mp4file, "MusicBrainz Artist Id", mdata->artistId, strlen(mdata->artistId) + 1);
+ 
+-  MP4SetMetadataFreeForm(mp4file, "MusicIP PUID", (u_int8_t *)mdata->filePUID, strlen(mdata->filePUID) + 1);
++  mp4SetItmfItemValue(mp4file, "MusicIP PUID", mdata->filePUID, strlen(mdata->filePUID) + 1);
+ 
+-  MP4SetMetadataFreeForm(mp4file, "MusicBrainz Album Artist Id", (u_int8_t *)mdata->albumArtistId, strlen(mdata->albumArtistId) + 1);
++  mp4SetItmfItemValue(mp4file, "MusicBrainz Album Artist Id", mdata->albumArtistId, strlen(mdata->albumArtistId) + 1);
+ 
+-  MP4SetMetadataFreeForm(mp4file, "MusicBrainz Album Artist Sortname", (u_int8_t *)mdata->albumArtistSortName, strlen(mdata->albumArtistSortName) + 1);
++  mp4SetItmfItemValue(mp4file, "MusicBrainz Album Artist Sortname", mdata->albumArtistSortName, strlen(mdata->albumArtistSortName) + 1);
+ 
+-  MP4SetMetadataFreeForm(mp4file, "MusicBrainz Album Artist", (u_int8_t *)mdata->albumArtist, strlen(mdata->albumArtist) + 1);
++  mp4SetItmfItemValue(mp4file, "MusicBrainz Album Artist", mdata->albumArtist, strlen(mdata->albumArtist) + 1);
+ 
+   convertFromAlbumType(mdata->albumType, temp2);
+-  MP4SetMetadataFreeForm(mp4file, "MusicBrainz Album Type", (u_int8_t *)temp2.c_str(), temp2.length() + 1);
++  mp4SetItmfItemValue(mp4file, "MusicBrainz Album Type", temp2.c_str(), temp2.length() + 1);
+   
+   convertFromAlbumStatus(mdata->albumStatus, temp2);
+-  MP4SetMetadataFreeForm(mp4file, "MusicBrainz Album Status", (u_int8_t *)temp2.c_str(), temp2.length() + 1);
++  mp4SetItmfItemValue(mp4file, "MusicBrainz Album Status", temp2.c_str(), temp2.length() + 1);
+   
+   if (mdata->releaseYear > 0) {
+     if (mdata->releaseMonth > 0) {
+@@ -307,17 +349,14 @@
+   else {
+     strcpy(temp, "");
+   }
+-  MP4SetMetadataFreeForm(mp4file, "MusicBrainz Album Release Date", (u_int8_t *)temp, strlen(temp) + 1);
++  mp4SetItmfItemValue(mp4file, "MusicBrainz Album Release Date", temp, strlen(temp) + 1);
+   
+-  MP4SetMetadataFreeForm(mp4file, "MusicBrainz Album Release Country", (u_int8_t *)mdata->releaseCountry, strlen(mdata->releaseCountry) + 1);
+-
+-  MP4SetMetadataCompilation(mp4file, mdata->variousArtist ? 1 : 0);
++  mp4SetItmfItemValue(mp4file, "MusicBrainz Album Release Country", mdata->releaseCountry, strlen(mdata->releaseCountry) + 1);
+ 
+   sprintf(temp, "%d", mdata->nonAlbum);  
+-  MP4SetMetadataFreeForm(mp4file, "MusicBrainz Non-Album", (u_int8_t *)temp, strlen(temp) + 1);
++  mp4SetItmfItemValue(mp4file, "MusicBrainz Non-Album", temp, strlen(temp) + 1);
+   
+-  if (!MP4Close(mp4file))
+-    return 0;
++  MP4Close(mp4file);
+ 
+ #ifndef WIN32
+   if (!MP4Optimize(utf8ToEncoding(fileName, encoding).c_str()))
