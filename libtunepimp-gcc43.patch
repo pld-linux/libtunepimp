@@ -48,7 +48,7 @@ diff -up libtunepimp-0.5.3/lib/c_wrapper.cpp.gcc43 libtunepimp-0.5.3/lib/c_wrapp
 --- libtunepimp-0.5.3/lib/c_wrapper.cpp.gcc43	2006-11-18 04:52:33.000000000 -0600
 +++ libtunepimp-0.5.3/lib/c_wrapper.cpp	2008-02-21 20:39:10.000000000 -0600
 @@ -24,6 +24,7 @@
-    $Id$
+    $Id: c_wrapper.cpp 8360 2006-08-07 21:05:12Z luks $
  
  ----------------------------------------------------------------------------*/
 +#include <stdlib.h>
