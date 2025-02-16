@@ -16,6 +16,7 @@ Patch0:		%{name}-ltdl.patch
 Patch1:		%{name}-mp4v2.patch
 Patch2:		%{name}-gcc43.patch
 Patch3:		gcc44.patch
+Patch4:		build.patch
 URL:		https://wiki.musicbrainz.org/libtunepimp
 BuildRequires:	autoconf >= 2.52
 BuildRequires:	automake
@@ -92,6 +93,7 @@ Wiązania Pythona do biblioteki libtunepimp.
 %patch -P2 -p1
 %patch -P3 -p1
 %patch -P1 -p1
+%patch -P4 -p1
 
 %{__sed} -i 's/ -O2//' configure.in
 %{__sed} -i 's/lt_dlhandle_struct \*/lt_dlhandle/' lib/plugins.cpp

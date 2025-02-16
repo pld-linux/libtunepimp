@@ -1,0 +1,48 @@
+--- libtunepimp-0.5.3/plugins/mp3/id3tag-2.3/file.c.orig	2006-11-18 11:51:07.000000000 +0100
++++ libtunepimp-0.5.3/plugins/mp3/id3tag-2.3/file.c	2025-02-16 13:02:21.819958859 +0100
+@@ -38,6 +38,7 @@
+ 
+ # include "id3tag.h"
+ # include "file.h"
++# include "frame.h"
+ # include "tag.h"
+ # include "field.h"
+ # include "fileio.h"
+@@ -125,7 +126,7 @@
+       {
+           genreframe = id3_2_3_tag_findframe(tag, "TCON", 0);
+           if (genreframe)
+-              id3_2_3_tag_addref(genreframe);
++              id3_2_3_frame_addref(genreframe);
+           id3_2_3_tag_clearframes(tag);
+       }
+ 
+@@ -141,7 +142,7 @@
+       if (!hasGenre && genreframe)
+       {
+           id3_2_3_tag_attachframe(tag, genreframe);
+-          id3_2_3_tag_delref(genreframe);
++          id3_2_3_frame_delref(genreframe);
+       }
+   }
+ 
+--- libtunepimp-0.5.3/plugins/mp3/id3tag-2.3/frame.c.orig	2006-11-18 11:51:07.000000000 +0100
++++ libtunepimp-0.5.3/plugins/mp3/id3tag-2.3/frame.c	2025-02-16 13:28:34.923069932 +0100
+@@ -367,7 +367,7 @@
+       goto fail;
+ 
+     *ptr += 4;
+-    uint_size = id3_parse_uint(ptr, 4);
++    uint_size = id3_2_3_parse_uint(ptr, 4);
+     *ptr -= 4;
+     size  = id3_2_3_parse_syncsafe(ptr, 4);
+     flags = id3_2_3_parse_uint(ptr, 2);
+@@ -377,7 +377,7 @@
+ 
+     /* fix Apple's screwed up tags */
+     if (uint_size >= 32767) 
+-      if (!id3_frametype_lookup(id + size, 4)) 
++      if (!id3_2_3_frametype_lookup(id + size, 4)) 
+         size = uint_size;
+     
+     if (size > end - *ptr)
